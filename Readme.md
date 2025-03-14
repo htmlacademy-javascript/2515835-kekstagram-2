@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
 * Студент: [Камилла Тувакова](https://up.htmlacademy.ru/javascript-individual/2/user/2515835).
-* Наставник: `Михаил`.
+* Наставник: [Михаил Данюшин](https://htmlacademy.ru/profile/id225742).
 
 ---
 
