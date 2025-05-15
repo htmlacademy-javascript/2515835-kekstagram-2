@@ -5,5 +5,4 @@ const photosArray = generatePhotos();
 console.log(photosArray);
 
 import { renderPhotos } from './renderPhoto.js';
-import { photosData } from './data.js';
-renderPhotos(photosData);
+renderPhotos(photosArray);
