@@ -16,3 +16,6 @@ export function generatePhotos() {
 
   return photos;
 }
+
+const photosArray = generatePhotos ();
+export {photosArray};
