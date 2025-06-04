@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('img-upload');
+  const form = document.querySelector('#upload-select-image');
   const pristine = new Pristine(form, {
       classTo: 'img-upload__field-wrapper',
       errorClass: 'is-invalid',

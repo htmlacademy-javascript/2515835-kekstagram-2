@@ -1,6 +1,6 @@
-const imageInput = document.getElementById('upload-file');
-const imgUploadOverlay = document.getElementById('img-upload-overlay');
-const imagePreview = document.getElementById('image-preview');
+const imageInput = document.querySelector('#upload-file');
+const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+const imagePreview = document.querySelector('.image-preview img');
 const body = document.body;
 
 
