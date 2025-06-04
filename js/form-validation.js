@@ -12,25 +12,36 @@ document.addEventListener('DOMContentLoaded', function () {
   const hashtagsInput = document.querySelector('.text__hashtags');
   const commentInput = document.querySelector('.text__description');
 
-  pristine.addValidator(
-      hashtagsInput,
-      function (value) {
-          if (!value) return true;
+  pristine.addValidator(hashtagsInput, (value) => {
+    const errorMessages = [];
 
-          const hashtags = value.split(' ').map(tag => tag.toLowerCase());
-          if (hashtags.length > 5) return false;
+    if (!value) return true;
 
-          const uniqueHashtags = new Set(hashtags);
-          if (uniqueHashtags.size !== hashtags.length) return false;
+    const hashtags = value.split(' ').map(tag => tag.toLowerCase());
+    const uniqueHashtags = new Set(hashtags);
 
-          for (const tag of uniqueHashtags) {
-              if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) return false;
-          }
+    if (hashtags.length > 5) {
+        errorMessages.push('Слишком много хештегов (максимум 5).');
+    }
 
-          return true;
-      },
-      'Некорректные хэштеги'
-  );
+    if (uniqueHashtags.size !== hashtags.length) {
+        errorMessages.push('Хештеги должны быть уникальными.');
+    }
+
+    for (const tag of uniqueHashtags) {
+        if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) {
+            errorMessages.push('Некорректный формат хештега.');
+        }
+    }
+
+    if (errorMessages.length > 0) {
+        console.error(errorMessages.join('\n'));
+        return false;
+    }
+
+    return true;
+}, 'Некорректные хештеги');
+
 
   pristine.addValidator(
       commentInput,
