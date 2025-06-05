@@ -9,4 +9,15 @@ document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
   });
 });
 
+import { formModule } from './formModule.js';
+const formData = {
+  hashtags: '',
+  comment: 'Пример комментария',
+};
 
+formModule.addValidationRule('hashtags', formModule.rules.required('Хэштеги обязательны'));
+formModule.addValidationRule('comment', formModule.rules.required('Комментарий обязателен'));
+
+
+const errors = formModule.validate(formData);
+console.log(errors);
