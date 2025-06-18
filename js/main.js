@@ -21,3 +21,52 @@ formModule.addValidationRule('comment', formModule.rules.required('Коммен�
 
 const errors = formModule.validate(formData);
 console.log(errors);
+
+import { fetchPhotos, sendFormData } from './api.js';
+
+const form = document.querySelector('.img-filters__form');
+
+
+const showMessage = (templateId) => {
+  const template = document.querySelector(`#${templateId}`);
+  if (!template) return;
+  const clone = template.content.cloneNode(true);
+  document.body.appendChild(clone);
+
+  setTimeout(() => {
+    const msg = document.querySelector(`.${templateId}`) || document.querySelector(`section.${templateId}`);
+    if (msg) msg.remove();
+  }, 5000);
+};
+
+fetchPhotos()
+  .then((photosArray) => {
+    renderPhotos(photosArray);
+
+    document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+      thumb.addEventListener('click', () => {
+        openBigPicture(photosArray[index]);
+      });
+    });
+
+  })
+  .catch(() => {
+    showMessage('data-error');
+  });
+
+if (form) {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+
+    const formData = new FormData(form);
+
+    sendFormData(formData)
+      .then(() => {
+        showMessage('success');
+        form.reset();
+      })
+      .catch(() => {
+        showMessage('error');
+      });
+  });
+}
