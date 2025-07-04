@@ -1,3 +1,4 @@
+let onLoadMoreComments;
 const bigPictureContainer = document.querySelector('.big-picture');
 const bigPictureImage = bigPictureContainer.querySelector('.big-picture__img img');
 const likesCountElement = bigPictureContainer.querySelector('.likes-count');
@@ -10,7 +11,6 @@ const commentCountBlock = bigPictureContainer.querySelector('.social__comment-co
 const loadMoreCommentsButton = bigPictureContainer.querySelector('.comments-loader');
 
 let escKeyHandler;
-
 let allComments = [];
 let commentsShownCount = 0;
 const COMMENTS_PER_PAGE = 5;
@@ -31,10 +31,8 @@ const showComments = () => {
     commentsList.appendChild(commentItem);
   });
 
-
   commentsCountElement.textContent = commentsToShow.length;
   totalCommentsCountElement.textContent = allComments.length;
-
 
   if (commentsToShow.length >= allComments.length) {
     loadMoreCommentsButton.classList.add('hidden');
@@ -43,12 +41,10 @@ const showComments = () => {
   }
 };
 
-
 export const openBigPicture = (photoData) => {
-  // Устанавливаем изображение и описание
+
   bigPictureImage.src = photoData.url;
   bigPictureImage.alt = photoData.description;
-
   likesCountElement.textContent = photoData.likes;
 
 
@@ -59,37 +55,32 @@ export const openBigPicture = (photoData) => {
 
   showComments();
 
-
   captionElement.textContent = photoData.description;
 
 
   bigPictureContainer.classList.remove('hidden');
 
-
   commentCountBlock.classList.add('hidden');
 
 
+  onLoadMoreComments = () => {
+    commentsShownCount += COMMENTS_PER_PAGE;
+    if (commentsShownCount > allComments.length) {
+      commentsShownCount = allComments.length;
+    }
+    showComments();
+  };
+
+
+  loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
+
   if (allComments.length > COMMENTS_PER_PAGE) {
     loadMoreCommentsButton.classList.remove('hidden');
-
-
-    loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
     loadMoreCommentsButton.addEventListener('click', onLoadMoreComments);
-
-
-    function onLoadMoreComments() {
-      commentsShownCount += COMMENTS_PER_PAGE;
-      if (commentsShownCount > allComments.length) {
-        commentsShownCount = allComments.length;
-      }
-      showComments();
-    }
-
   } else {
     loadMoreCommentsButton.classList.add('hidden');
     loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
   }
-
 
   document.body.classList.add('modal-open');
 
@@ -106,19 +97,19 @@ export const openBigPicture = (photoData) => {
   closeButton.addEventListener('click', closeBigPicture);
 };
 
-
 const closeBigPicture = () => {
+
   document.removeEventListener('keydown', escKeyHandler);
+
+  if (onLoadMoreComments) {
+    loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
+    onLoadMoreComments = null;
+  }
 
 
   bigPictureContainer.classList.add('hidden');
 
-
   document.body.classList.remove('modal-open');
 
-
   closeButton.removeEventListener('click', closeBigPicture);
-
-
-   loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
 };

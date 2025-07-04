@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   if (imageInput && imagePreview && imgUploadOverlay) {
-
-    imageInput.addEventListener('change', function (e) {
+    imageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  document.addEventListener('keydown', function (e) {
+  document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeOverlay();
     }

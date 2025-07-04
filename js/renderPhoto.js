@@ -1,4 +1,4 @@
-import{photosArray} from './photos.js'
+import{photosArray} from './photos.js';
 
 const createPhotoElement = (photo, index) => {
   const template = document.querySelector('#picture').content.querySelector('.picture');
@@ -39,15 +39,19 @@ import { openBigPicture } from './bigPicture.js';
 const containerPhotos = document.querySelector('.pictures');
 
 const addThumbnailClickListeners = () => {
-   containerPhotos.addEventListener('click', (evt) => {
-     const thumbnail = evt.target.closest('.picture');
-     if (!thumbnail) return;
+  containerPhotos.addEventListener('click', (evt) => {
+    const thumbnail = evt.target.closest('.picture');
+    if (!thumbnail) {
+      return;
+    }
 
-     const index = parseInt(thumbnail.dataset.index, 10);
-     if (isNaN(index)) return;
-     const photoData = photosArray[index];
-     openBigPicture(photoData);
-   });
+    const index = parseInt(thumbnail.dataset.index, 10);
+    if (isNaN(index)) {
+      return;
+    }
+    const photoData = photosArray[index];
+    openBigPicture(photoData);
+  });
 };
 
 addThumbnailClickListeners();

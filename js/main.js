@@ -2,33 +2,29 @@ import { renderPhotos } from './renderPhoto.js';
 import { openBigPicture } from './bigPicture.js';
 import { fetchPhotos, sendFormData } from './api.js';
 import { formModule } from './formModule.js';
+import { debounce } from './utils.js';
 
 const showMessage = (templateId) => {
   const template = document.querySelector(`#${templateId}`);
-  if (!template) return;
+  if (!template) {
+    return;
+  }
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
 
   setTimeout(() => {
     const msg = document.querySelector(`.${templateId}`) || document.querySelector(`section.${templateId}`);
-    if (msg) msg.remove();
+    if (msg) {
+      msg.remove();
+    }
   }, 5000);
 };
 
-const debounce = (func, delay) => {
-  let timeoutId;
-  return (...args) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
-    }, delay);
-  };
-};
-
+const form = document.querySelector('.img-filters__form');
 
 fetchPhotos()
   .then((arr) => {
-    let allPhotos = [...arr];
+    const allPhotos = [...arr];
 
 
     renderPhotos(arr);
@@ -43,56 +39,56 @@ fetchPhotos()
 
     const filtersContainer = document.querySelector('.img-filters');
     if (filtersContainer) {
-      filtersContainer.classList.remove('img-filters--inactive');
-
-      const form = document.querySelector('.img-filters__form');
+     // filtersContainer.classList.remove('img-filters--inactive');
 
       const getRandomInt = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min +1)) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
       };
 
       const getRandomPhotos = (photos, count) => {
         const shuffled = [...photos];
-        for (let i=shuffled.length-1; i>0; i--) {
-          const j=getRandomInt(0,i);
-          [shuffled[i], shuffled[j]]=[shuffled[j], shuffled[i]];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = getRandomInt(0,i);
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         return shuffled.slice(0,count);
       };
 
       const clearPhotos = () => {
-        document.querySelector('.pictures').innerHTML='';
+        document.querySelector('.picture').remove()
       };
 
       const applyFilter = (filterId) => {
-        let filteredPhotos=[];
+        let filteredPhotos = [];
         switch(filterId){
           case 'filter-default':
-            filteredPhotos=[...allPhotos];
+            filteredPhotos = [...allPhotos];
             break;
           case 'filter-random':
-            filteredPhotos=getRandomPhotos(allPhotos,10);
+            filteredPhotos = getRandomPhotos(allPhotos,10);
             break;
           case 'filter-discussed':
-            filteredPhotos=[...allPhotos].sort((a,b)=>b.comments.length - a.comments.length);
+            filteredPhotos = [...allPhotos].sort((a,b)=>b.comments.length - a.comments.length);
             break;
           default:
-            filteredPhotos=[...allPhotos];
+            filteredPhotos = [...allPhotos];
         }
         clearPhotos();
         renderPhotos(filteredPhotos);
       };
 
       form.addEventListener('click', debounce((evt)=>{
-        if(evt.target.tagName!=='BUTTON') return;
+        if(evt.target.tagName !== 'BUTTON') {
+          return;
+        }
 
 
-        form.querySelectorAll('button').forEach(btn=>btn.classList.remove('img-filters__button--active'));
+        form.querySelectorAll('button').forEach((btn)=>btn.classList.remove('img-filters__button--active'));
         evt.target.classList.add('img-filters__button--active');
 
-        const filterId=evt.target.id;
+        const filterId = evt.target.id;
         applyFilter(filterId);
 
       },500));
@@ -102,7 +98,7 @@ fetchPhotos()
     if (form) {
       form.addEventListener('submit', (evt)=>{
         evt.preventDefault();
-        const formData=new FormData(form);
+        const formData = new FormData(form);
         sendFormData(formData)
           .then(()=>{
             showMessage('success');
@@ -114,9 +110,7 @@ fetchPhotos()
       });
     }
 
-
-
-    const formValidationData={
+    const formValidationData = {
       hashtags:'',
       comment:'Пример комментария',
     };
@@ -124,10 +118,10 @@ fetchPhotos()
     formModule.addValidationRule('hashtags', formModule.rules.required('Хэштеги обязательны'));
     formModule.addValidationRule('comment', formModule.rules.required('Комментарий обязателен'));
 
-    const errors= formModule.validate(formValidationData);
+    const errors = formModule.validate(formValidationData);
     console.log(errors);
 
   })
   .catch(() => {
     showMessage('data-error');
-});
+  });
