@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  let currentEffect = 'none';
   const scaleInput = document.querySelector('.scale__control--value');
   const btnSmaller = document.querySelector('.scale__control--smaller');
   const btnBigger = document.querySelector('.scale__control--bigger');
@@ -31,11 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const effectRadios = document.querySelectorAll('input[name=effect]');
   const effectLevelContainer = document.querySelector('.effect-level');
   const sliderContainer = effectLevelContainer.querySelector('.effect-level__slider');
-  const effectLevelValue = effectLevelContainer.querySelector('.effect-level__value');
   const effectLevelNumberInput = effectLevelContainer.querySelector('.effect-level__value');
-
-
-  let currentEffect = 'none';
 
 
   noUiSlider.create(sliderContainer, {
@@ -126,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
           case 'phobos':
           case 'heat':
             level = valuePercent / 100;
-            setFilter(effect, level);
+            setFilter(currentEffect, level);
             break;
         }
 

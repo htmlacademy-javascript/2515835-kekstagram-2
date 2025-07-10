@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#upload-select-image');
   const pristine = new Pristine(form, {
     classTo: 'img-upload__field-wrapper',
@@ -15,9 +15,11 @@ document.addEventListener('DOMContentLoaded', function () {
   pristine.addValidator(hashtagsInput, (value) => {
     const errorMessages = [];
 
-    if (!value) return true;
+    if (!value) {
+      return true;
+    }
 
-    const hashtags = value.split(' ').map(tag => tag.toLowerCase());
+    const hashtags = value.split(' ').map((tag) => tag.toLowerCase());
     const uniqueHashtags = new Set(hashtags);
 
     if (hashtags.length > 5) {
@@ -35,40 +37,46 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (errorMessages.length > 0) {
+      // eslint-disable-next-line no-console
       console.error(errorMessages.join('\n'));
       return false;
     }
 
     return true;
-  },'Некорректные хештеги');
-
+  }, 'Некорректные хештеги');
 
   pristine.addValidator(
     commentInput,
-    function (value) {
-      if (!value) return true;
+    (value) => {
+      if (!value) {
+        return true;
+      }
       return value.length <= 140;
     },
     'Комментарий не может превышать 140 символов'
   );
 
-  hashtagsInput.addEventListener('input', function () {
+  hashtagsInput.addEventListener('input', () => {
     pristine.validate();
   });
 
-  commentInput.addEventListener('input', function () {
+  commentInput.addEventListener('input', () => {
     pristine.validate();
   });
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-
     if (pristine.validate()) {
+      // eslint-disable-next-line no-console
       console.log('Форма валидна! Отправка данных...');
 
+
     } else {
+      // eslint-disable-next-line no-console
       console.log('Форма содержит ошибки. Исправьте их перед отправкой.');
+
+
     }
   });
 
@@ -100,9 +108,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function closeOverlay(e) {
     if (e.key === 'Escape') {
-      console.log("Закрытие формы");
+      // eslint-disable-next-line no-console
+      console.log('Закрытие формы');
+
       isOverlayClosed = true;
+
       toggleOverlayListeners(false);
+
 
     }
   }

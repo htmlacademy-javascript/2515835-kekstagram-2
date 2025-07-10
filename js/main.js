@@ -39,7 +39,6 @@ fetchPhotos()
 
     const filtersContainer = document.querySelector('.img-filters');
     if (filtersContainer) {
-     // filtersContainer.classList.remove('img-filters--inactive');
 
       const getRandomInt = (min, max) => {
         min = Math.ceil(min);
@@ -57,7 +56,7 @@ fetchPhotos()
       };
 
       const clearPhotos = () => {
-        document.querySelector('.picture').remove()
+        document.querySelector('.picture').remove();
       };
 
       const applyFilter = (filterId) => {
@@ -119,6 +118,7 @@ fetchPhotos()
     formModule.addValidationRule('comment', formModule.rules.required('Комментарий обязателен'));
 
     const errors = formModule.validate(formValidationData);
+    // eslint-disable-next-line no-console
     console.log(errors);
 
   })
