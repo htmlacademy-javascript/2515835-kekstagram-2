@@ -37,13 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (errorMessages.length > 0) {
-      // eslint-disable-next-line no-console
-      console.error(errorMessages.join('\n'));
       return false;
     }
 
     return true;
   }, 'Некорректные хештеги');
+
 
   pristine.addValidator(
     commentInput,
@@ -67,16 +66,12 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (pristine.validate()) {
-      // eslint-disable-next-line no-console
-      console.log('Форма валидна! Отправка данных...');
 
+    if (pristine.validate()) {
+      // Форма валидна! Отправка данных...
 
     } else {
-      // eslint-disable-next-line no-console
-      console.log('Форма содержит ошибки. Исправьте их перед отправкой.');
-
-
+      // Форма содержит ошибки. Исправьте их перед отправкой.
     }
   });
 
@@ -108,13 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function closeOverlay(e) {
     if (e.key === 'Escape') {
-      // eslint-disable-next-line no-console
-      console.log('Закрытие формы');
-
       isOverlayClosed = true;
-
       toggleOverlayListeners(false);
-
 
     }
   }
