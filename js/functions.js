@@ -35,5 +35,6 @@ function isMeetingWithinWorkday(workStart, workEnd, meetingStart, meetingDuratio
 
   return meetingStartMin >= workStartMin && meetingEndMin <= workEndMin;
 }
+// eslint-disable-next-line no-console
 console.log(isMeetingWithinWorkday('08:00', '17:30', '14:00', 90));
 

@@ -15,6 +15,23 @@ let allComments = [];
 let commentsShownCount = 0;
 const COMMENTS_PER_PAGE = 5;
 
+const closeBigPicture = () => {
+
+  document.removeEventListener('keydown', escKeyHandler);
+
+  if (onLoadMoreComments) {
+    loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
+    onLoadMoreComments = null;
+  }
+
+
+  bigPictureContainer.classList.add('hidden');
+
+  document.body.classList.remove('modal-open');
+
+  closeButton.removeEventListener('click', closeBigPicture);
+};
+
 const showComments = () => {
   commentsList.innerHTML = '';
 
@@ -95,21 +112,4 @@ export const openBigPicture = (photoData) => {
 
 
   closeButton.addEventListener('click', closeBigPicture);
-};
-
-const closeBigPicture = () => {
-
-  document.removeEventListener('keydown', escKeyHandler);
-
-  if (onLoadMoreComments) {
-    loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
-    onLoadMoreComments = null;
-  }
-
-
-  bigPictureContainer.classList.add('hidden');
-
-  document.body.classList.remove('modal-open');
-
-  closeButton.removeEventListener('click', closeBigPicture);
 };
