@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBigger = document.querySelector('.scale__control--bigger');
   const previewImage = document.querySelector('.img-upload__preview img');
 
-
   function getCurrentScale() {
     return parseInt(scaleInput.value, 10);
   }
@@ -26,14 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setScale(currentScale + 25);
   });
 
-
   setScale(getCurrentScale());
 
   const effectRadios = document.querySelectorAll('input[name=effect]');
   const effectLevelContainer = document.querySelector('.effect-level');
   const sliderContainer = effectLevelContainer.querySelector('.effect-level__slider');
   const effectLevelNumberInput = effectLevelContainer.querySelector('.effect-level__value');
-
 
   noUiSlider.create(sliderContainer, {
     start: [100],
@@ -44,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     step:1,
     connect:'lower'
   });
-
 
   function getMaxForEffect(effect){
     switch(effect){
@@ -80,67 +76,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
   function applyEffect(effect) {
     currentEffect = effect;
 
     if(effect === 'none'){
+      effectLevelContainer.style.display='none';
+      previewImage.style.filter='';
+      effectLevelNumberInput.value='0';
 
-      effectLevelContainer.style.display = 'none';
-
-
-      previewImage.style.filter = '';
-
-
-      effectLevelNumberInput.value = '0';
+      sliderContainer.noUiSlider.off('update');
 
     } else{
-      effectLevelContainer.style.display = 'block';
-      let initialLevel = 1;
+      effectLevelContainer.style.display='block';
+
+      let initialLevelPercent;
 
       switch(effect){
-        case 'chrome': initialLevel = 1; break;
-        case 'sepia': initialLevel = 1; break;
-        case 'marvin': initialLevel = 1; break;
-        case 'phobos': initialLevel = 3; break;
-        case 'heat': initialLevel = 2; break;
+        case 'chrome':
+          initialLevelPercent=getMaxForEffect(effect)*100;
+          break;
+        case 'sepia':
+          initialLevelPercent=getMaxForEffect(effect)*100;
+          break;
+        case 'marvin':
+          initialLevelPercent=getMaxForEffect(effect)*100;
+          break;
+        case 'phobos':
+          initialLevelPercent=getMaxForEffect(effect)*100;
+          break;
+        case 'heat':
+          initialLevelPercent=getMaxForEffect(effect)*100;
+          break;
+        default:
+          initialLevelPercent=100;
       }
 
-      sliderContainer.noUiSlider.set(initialLevel * getMaxForEffect(effect));
+      sliderContainer.noUiSlider.set(initialLevelPercent);
 
+      effectLevelNumberInput.value='0.5';
 
-      setFilter(effect, initialLevel);
+      let level=initialLevelPercent/100;
 
+      setFilter(effect, level);
+
+      sliderContainer.noUiSlider.off('update');
 
       sliderContainer.noUiSlider.on('update', (values) => {
-        const valuePercent = parseFloat(values[0]);
-        let level;
+        const valuePercent=parseFloat(values[0]);
+        const level=valuePercent/100;
 
-        switch(effect){
-          case 'chrome':
-          case 'sepia':
-          case 'marvin':
-          case 'phobos':
-          case 'heat':
-            level = valuePercent / 100;
-            setFilter(currentEffect, level);
-            break;
-        }
+        setFilter(currentEffect, level);
 
-
-        effectLevelNumberInput.value = valuePercent.toFixed(2);
+        effectLevelNumberInput.value=level.toFixed(2);
 
       });
     }
-  }
+   }
 
+   effectRadios.forEach((radio) => {
+     radio.addEventListener('change', () => {
+       applyEffect(radio.value);
+     });
+   });
 
-  effectRadios.forEach((radio) => {
-    radio.addEventListener('change', () => {
-      applyEffect(radio.value);
-    });
-  });
-
-  applyEffect('none');
-
+   applyEffect('none');
 });

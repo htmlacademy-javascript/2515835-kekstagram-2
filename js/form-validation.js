@@ -13,65 +13,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentInput = document.querySelector('.text__description');
 
   pristine.addValidator(hashtagsInput, (value) => {
-    const errorMessages = [];
+    if (!value) return true;
 
-    if (!value) {
-      return true;
+    const hashtags = value.trim().split(/\s+/);
+    const lowerHashtags = hashtags.map(tag => tag.toLowerCase());
+    const uniqueHashtags = new Set(lowerHashtags);
+
+    if (hashtags.length > 5) return false;
+    if (uniqueHashtags.size !== hashtags.length) return false;
+
+    for (const tag of hashtags) {
+      if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) return false;
     }
-
-    const hashtags = value.split(' ').map((tag) => tag.toLowerCase());
-    const uniqueHashtags = new Set(hashtags);
-
-    if (hashtags.length > 5) {
-      errorMessages.push('Слишком много хештегов (максимум 5).');
-    }
-
-    if (uniqueHashtags.size !== hashtags.length) {
-      errorMessages.push('Хештеги должны быть уникальными.');
-    }
-
-    for (const tag of uniqueHashtags) {
-      if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) {
-        errorMessages.push('Некорректный формат хештега.');
-      }
-    }
-
-    if (errorMessages.length > 0) {
-      return false;
-    }
-
     return true;
   }, 'Некорректные хештеги');
 
 
   pristine.addValidator(
     commentInput,
-    (value) => {
-      if (!value) {
-        return true;
-      }
-      return value.length <= 140;
-    },
+    (value) => !value || value.length <= 140,
     'Комментарий не может превышать 140 символов'
   );
 
-  hashtagsInput.addEventListener('input', () => {
-    pristine.validate();
-  });
 
-  commentInput.addEventListener('input', () => {
-    pristine.validate();
-  });
+  hashtagsInput.addEventListener('input', () => pristine.validate());
+  commentInput.addEventListener('input', () => pristine.validate());
+
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-
-
     if (pristine.validate()) {
-      // Форма валидна! Отправка данных...
+      isOverlayClosed = false;
+      toggleOverlayListeners(true);
 
     } else {
-      // Форма содержит ошибки. Исправьте их перед отправкой.
+
     }
   });
 
@@ -79,15 +55,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function toggleOverlayListeners(add) {
     if (add) {
+      isOverlayClosed = false;
+      document.addEventListener('keydown', closeOverlay);
       hashtagsInput.addEventListener('focus', removeOverlayListener);
       commentInput.addEventListener('focus', removeOverlayListener);
       hashtagsInput.addEventListener('blur', addOverlayListener);
       commentInput.addEventListener('blur', addOverlayListener);
     } else {
+      document.removeEventListener('keydown', closeOverlay);
       hashtagsInput.removeEventListener('focus', removeOverlayListener);
       commentInput.removeEventListener('focus', removeOverlayListener);
       hashtagsInput.removeEventListener('blur', addOverlayListener);
       commentInput.removeEventListener('blur', addOverlayListener);
+
+      isOverlayClosed = true;
     }
   }
 
@@ -102,12 +83,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeOverlay(e) {
+    const activeElement = document.activeElement;
+
+
+    if (activeElement === hashtagsInput || activeElement === commentInput) return;
+
     if (e.key === 'Escape') {
       isOverlayClosed = true;
       toggleOverlayListeners(false);
 
+
     }
   }
+
 
   toggleOverlayListeners(true);
 });
