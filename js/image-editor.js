@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBigger = document.querySelector('.scale__control--bigger');
   const previewImage = document.querySelector('.img-upload__preview img');
 
+
   function getCurrentScale() {
     return parseInt(scaleInput.value, 10);
   }
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setScale(currentScale + 25);
   });
 
+
   setScale(getCurrentScale());
 
   const effectRadios = document.querySelectorAll('input[name=effect]');
@@ -32,29 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const sliderContainer = effectLevelContainer.querySelector('.effect-level__slider');
   const effectLevelNumberInput = effectLevelContainer.querySelector('.effect-level__value');
 
+
   noUiSlider.create(sliderContainer, {
     start: [100],
     range: {
       min: [0],
       max: [100]
     },
-    step:1,
-    connect:'lower'
+    step: 1,
+    connect: 'lower'
   });
 
-  function getMaxForEffect(effect){
-    switch(effect){
-      case 'chrome': return 1.0;
-      case 'sepia': return 1.0;
-      case 'marvin': return 1.0;
-      case 'phobos': return 3.0;
-      case 'heat': return 2.0;
-    }
-    return 1.0;
-  }
 
   function setFilter(effect, level) {
-    switch(effect) {
+    switch (effect) {
       case 'none':
         previewImage.style.filter = '';
         break;
@@ -65,79 +58,83 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.style.filter = `sepia(${level})`;
         break;
       case 'marvin':
-        previewImage.style.filter = `invert(${level * 100}%)`;
+        previewImage.style.filter = `invert(${level}%)`;
         break;
       case 'phobos':
-        previewImage.style.filter = `blur(${level * 3}px)`;
+        previewImage.style.filter = `blur(${level}px)`;
         break;
       case 'heat':
-        previewImage.style.filter = `brightness(${1 + level})`;
+        previewImage.style.filter = `brightness(${level})`;
         break;
     }
   }
 
+
   function applyEffect(effect) {
     currentEffect = effect;
 
-    if(effect === 'none'){
-      effectLevelContainer.style.display='none';
-      previewImage.style.filter='';
-      effectLevelNumberInput.value='0';
+    if (effect === 'none') {
+      effectLevelContainer.style.display = 'none';
+      previewImage.style.filter = '';
+      effectLevelNumberInput.value = '0';
+    } else {
+      effectLevelContainer.style.display = 'block';
 
-      sliderContainer.noUiSlider.off('update');
+      let min, max, step, initialValue;
 
-    } else{
-      effectLevelContainer.style.display='block';
-
-      let initialLevelPercent;
-
-      switch(effect){
+      switch (effect) {
         case 'chrome':
-          initialLevelPercent=getMaxForEffect(effect)*100;
-          break;
         case 'sepia':
-          initialLevelPercent=getMaxForEffect(effect)*100;
+          min = 0;
+          max = 1;
+          step = 0.1;
+          initialValue = 1;
           break;
         case 'marvin':
-          initialLevelPercent=getMaxForEffect(effect)*100;
+          min = 0;
+          max = 100;
+          step = 1;
+          initialValue = 100;
           break;
         case 'phobos':
-          initialLevelPercent=getMaxForEffect(effect)*100;
+          min = 0;
+          max = 3;
+          step = 0.1;
+          initialValue = 3;
           break;
         case 'heat':
-          initialLevelPercent=getMaxForEffect(effect)*100;
+          min = 1;
+          max = 3;
+          step = 0.1;
+          initialValue = 3;
           break;
-        default:
-          initialLevelPercent=100;
       }
 
-      sliderContainer.noUiSlider.set(initialLevelPercent);
+      sliderContainer.noUiSlider.updateOptions({
+        range: { min, max },
+        step,
+        start: [initialValue]
+      });
 
-      effectLevelNumberInput.value='0.5';
-
-      let level=initialLevelPercent/100;
-
-      setFilter(effect, level);
-
-      sliderContainer.noUiSlider.off('update');
+      sliderContainer.noUiSlider.set(initialValue);
+      setFilter(effect, initialValue);
+      effectLevelNumberInput.value = initialValue.toString();
 
       sliderContainer.noUiSlider.on('update', (values) => {
-        const valuePercent=parseFloat(values[0]);
-        const level=valuePercent/100;
-
-        setFilter(currentEffect, level);
-
-        effectLevelNumberInput.value=level.toFixed(2);
-
+        const value = parseFloat(values[0]);
+        setFilter(currentEffect, value);
+        effectLevelNumberInput.value = value.toString();
       });
     }
-   }
+  }
 
-   effectRadios.forEach((radio) => {
-     radio.addEventListener('change', () => {
-       applyEffect(radio.value);
-     });
-   });
 
-   applyEffect('none');
+  effectRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      applyEffect(radio.value);
+    });
+  });
+
+  applyEffect('none');
+
 });

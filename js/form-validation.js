@@ -16,14 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!value) return true;
 
     const hashtags = value.trim().split(/\s+/);
-    const lowerHashtags = hashtags.map(tag => tag.toLowerCase());
-    const uniqueHashtags = new Set(lowerHashtags);
 
     if (hashtags.length > 5) return false;
+
+    const lowerHashtags = hashtags.map(tag => tag.toLowerCase());
+    const uniqueHashtags = new Set(lowerHashtags);
     if (uniqueHashtags.size !== hashtags.length) return false;
 
     for (const tag of hashtags) {
-      if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) return false;
+      if (!tag.startsWith('#')) return false;
+      if (tag.length < 2) return false;
+      if (tag.length > 20) return false;
+      const tagBody = tag.slice(1);
+      if (!/^[A-Za-zА-Яа-яЁё0-9]+$/.test(tagBody)) return false;
+      if (tag === '#') return false;
     }
     return true;
   }, 'Некорректные хештеги');
@@ -31,7 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   pristine.addValidator(
     commentInput,
-    (value) => !value || value.length <= 140,
+    (value) => {
+      if (!value) return true;
+      return value.length <= 140;
+    },
     'Комментарий не может превышать 140 символов'
   );
 
@@ -40,62 +49,29 @@ document.addEventListener('DOMContentLoaded', () => {
   commentInput.addEventListener('input', () => pristine.validate());
 
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (pristine.validate()) {
-      isOverlayClosed = false;
-      toggleOverlayListeners(true);
+  document.addEventListener('keydown', (e) => {
+    const activeElement = document.activeElement;
 
-    } else {
+    if (
+      activeElement === hashtagsInput ||
+      activeElement === commentInput
+    ) {
+      return;
+    }
 
+    if (e.key === 'Escape') {
+      closeOverlay();
     }
   });
 
-  let isOverlayClosed = false;
+  function closeOverlay() {
+    console.log('Закрытие формы по Esc');
+  }
 
-  function toggleOverlayListeners(add) {
-    if (add) {
-      isOverlayClosed = false;
-      document.addEventListener('keydown', closeOverlay);
-      hashtagsInput.addEventListener('focus', removeOverlayListener);
-      commentInput.addEventListener('focus', removeOverlayListener);
-      hashtagsInput.addEventListener('blur', addOverlayListener);
-      commentInput.addEventListener('blur', addOverlayListener);
-    } else {
-      document.removeEventListener('keydown', closeOverlay);
-      hashtagsInput.removeEventListener('focus', removeOverlayListener);
-      commentInput.removeEventListener('focus', removeOverlayListener);
-      hashtagsInput.removeEventListener('blur', addOverlayListener);
-      commentInput.removeEventListener('blur', addOverlayListener);
-
-      isOverlayClosed = true;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (pristine.validate()) {
+      console.log('Форма валидна, можно отправлять');
     }
-  }
-
-  function removeOverlayListener() {
-    document.removeEventListener('keydown', closeOverlay);
-  }
-
-  function addOverlayListener() {
-    if (!isOverlayClosed) {
-      document.addEventListener('keydown', closeOverlay);
-    }
-  }
-
-  function closeOverlay(e) {
-    const activeElement = document.activeElement;
-
-
-    if (activeElement === hashtagsInput || activeElement === commentInput) return;
-
-    if (e.key === 'Escape') {
-      isOverlayClosed = true;
-      toggleOverlayListeners(false);
-
-
-    }
-  }
-
-
-  toggleOverlayListeners(true);
+  });
 });
