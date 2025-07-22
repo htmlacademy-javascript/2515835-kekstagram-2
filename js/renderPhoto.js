@@ -55,3 +55,6 @@ const addThumbnailClickListeners = () => {
 };
 
 addThumbnailClickListeners();
+
+
+

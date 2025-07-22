@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSmaller = document.querySelector('.scale__control--smaller');
   const btnBigger = document.querySelector('.scale__control--bigger');
   const previewImage = document.querySelector('.img-upload__preview img');
+  const imageInput = document.querySelector('#upload-file');
 
 
   function getCurrentScale() {
@@ -133,6 +134,39 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
       applyEffect(radio.value);
     });
+  });
+
+  function updateEffectPreviews(imageSrc) {
+    const previews = document.querySelectorAll('.effects__preview');
+
+    previews.forEach((preview) => {
+      const img = preview.querySelector('img');
+      if (img) {
+        img.src = imageSrc;
+      } else {
+        preview.style.backgroundImage = `url(${imageSrc})`;
+      }
+    });
+  }
+
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        const imageSrc = event.target.result;
+
+        previewImage.src = imageSrc;
+
+        updateEffectPreviews(imageSrc);
+      };
+
+      reader.readAsDataURL(file);
+
+      imgUploadOverlay.classList.remove('hidden');
+      body.classList.add('modal-open');
+    }
   });
 
   applyEffect('none');
