@@ -93,22 +93,22 @@ fetchPhotos()
 
       },500));
     }
+      const uploadForm = document.querySelector('.img-upload__form')
+      console.log(uploadForm)
 
-
-    if (form) {
-      form.addEventListener('submit', (evt)=>{
+      uploadForm.addEventListener('submit', (evt)=>{
         evt.preventDefault();
-        const formData = new FormData(form);
+        const formData = new FormData(uploadForm);
         sendFormData(formData)
           .then(()=>{
             showMessage('success');
-            form.reset();
+            uploadForm.reset();
           })
           .catch(()=>{
             showMessage('error');
           });
       });
-    }
+
 
     const formValidationData = {
       hashtags:'',
