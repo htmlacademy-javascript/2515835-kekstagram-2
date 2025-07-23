@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Закрытие формы по Esc');
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('#upload-submit', (e) => {
     e.preventDefault();
     if (pristine.validate()) {
       console.log('Форма валидна, можно отправлять');

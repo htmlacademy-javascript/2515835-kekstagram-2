@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnBigger = document.querySelector('.scale__control--bigger');
   const previewImage = document.querySelector('.img-upload__preview img');
   const imageInput = document.querySelector('#upload-file');
+  const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+  const body = document.body;
 
 
   function getCurrentScale() {

@@ -1,8 +1,8 @@
-import { renderPhotos } from './renderPhoto.js';
 import { openBigPicture } from './bigPicture.js';
 import { fetchPhotos, sendFormData } from './api.js';
 import { formModule } from './formModule.js';
 import { debounce } from './utils.js';
+import { renderPhotos,} from './renderPhoto.js';
 
 const showMessage = (templateId) => {
   const template = document.querySelector(`#${templateId}`);
@@ -25,14 +25,15 @@ const form = document.querySelector('.img-filters__form');
 fetchPhotos()
   .then((arr) => {
     const allPhotos = [...arr];
-
+   console.log(allPhotos)
 
     renderPhotos(arr);
 
 
-    document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-      thumb.addEventListener('click', () => {
+    document.querySelectorAll('.picture').forEach((thumb, index) => {
+      thumb.addEventListener('click', (evt) => {
         openBigPicture(arr[index]);
+        console.log(arr[index])
       });
     });
 
