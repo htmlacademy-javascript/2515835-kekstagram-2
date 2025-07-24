@@ -1,3 +1,25 @@
+import { sendFormData } from "./api";
+const imageInput = document.querySelector('#upload-file');
+const imagePreview = document.querySelector('.img-upload__preview img');
+const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+const body = document.body;
+
+const showMessage = (templateId) => {
+  const template = document.querySelector(`#${templateId}`);
+  if (!template) {
+    return;
+  }
+  const clone = template.content.cloneNode(true);
+  document.body.appendChild(clone);
+
+  setTimeout(() => {
+    const msg = document.querySelector(`.${templateId}`) || document.querySelector(`section.${templateId}`);
+    if (msg) {
+      msg.remove();
+    }
+  }, 5000);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#upload-select-image');
   const pristine = new Pristine(form, {
@@ -34,6 +56,38 @@ document.addEventListener('DOMContentLoaded', () => {
     return true;
   }, 'Некорректные хештеги');
 
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const activeElement = document.activeElement;
+
+      if(
+        activeElement === hashtagsInput ||
+        activeElement === commentInput
+      ) {
+        return
+      }
+      closeOverlay();
+    }
+  });
+
+  if (imageInput && imagePreview && imgUploadOverlay) {
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          imagePreview.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+
+        imgUploadOverlay.classList.remove('hidden');
+        body.classList.add('modal-open');
+      }
+    });
+  }
+
 
   pristine.addValidator(
     commentInput,
@@ -65,13 +119,37 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function closeOverlay() {
-    console.log('Закрытие формы по Esc');
+    if (formUploadOverlay && imagePreview) {
+      formUploadOverlay.classList.add('hidden');
+
+      body.classList.remove('modal-open');
+      imageInput.value = '';
+    }
   }
 
-  form.addEventListener('submit', (e) => {
+  const formUploadOverlay = document.querySelector('.img-upload__overlay');
+  const uploadForm = document.querySelector('.img-upload__form')
+
+  const closeForm = () => {
+    formUploadOverlay.classList.add('hidden');
+  }
+
+  uploadForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (pristine.validate()) {
-      console.log('Форма валидна, можно отправлять');
+      const formData = new FormData(uploadForm);
+      sendFormData(formData)
+        .then(() => {
+          showMessage('success');
+          uploadForm.reset();
+          closeOverlay();
+          pristine.reset({});
+        })
+        .catch(() => {
+          showMessage('error');
+        });
     }
   });
 });
+
+export { showMessage };
