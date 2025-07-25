@@ -20,7 +20,6 @@ fetchPhotos()
     document.querySelectorAll('.picture').forEach((thumb, index) => {
       thumb.addEventListener('click', (evt) => {
         openBigPicture(arr[index]);
-        console.log(arr[index])
       });
     });
 
@@ -44,7 +43,7 @@ fetchPhotos()
       };
 
       const clearPhotos = () => {
-        const pictures = document.querySelectorAll('picture');
+        const pictures = document.querySelectorAll('.picture');
         pictures.forEach(picture => picture.remove());
       };
 
