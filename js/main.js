@@ -12,16 +12,8 @@ const form = document.querySelector('.img-filters__form');
 fetchPhotos()
   .then((arr) => {
     const allPhotos = [...arr];
-   console.log(allPhotos)
 
     renderPhotos(arr);
-
-
-    document.querySelectorAll('.picture').forEach((thumb, index) => {
-      thumb.addEventListener('click', (evt) => {
-        openBigPicture(arr[index]);
-      });
-    });
 
 
     const filtersContainer = document.querySelector('.img-filters');
@@ -64,6 +56,12 @@ fetchPhotos()
         }
         clearPhotos();
         renderPhotos(filteredPhotos);
+
+        document.querySelectorAll('.picture').forEach((thumb, index) => {
+          thumb.addEventListener('click', (evt) => {
+            openBigPicture(filteredPhotos[index]);
+          });
+        });
       };
 
       const debouncedApplyFilter = debounce(applyFilter, 500);
