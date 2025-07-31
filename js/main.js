@@ -71,13 +71,11 @@ fetchPhotos()
           return;
         }
 
-
         form.querySelectorAll('button').forEach((btn) => btn.classList.remove('img-filters__button--active'));
         evt.target.classList.add('img-filters__button--active');
 
         const filterId = evt.target.id;
         debouncedApplyFilter(filterId);
-
       });
     }
 

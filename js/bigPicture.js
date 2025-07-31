@@ -98,13 +98,16 @@ export const openBigPicture = (photoData) => {
 
   document.body.classList.add('modal-open');
 
+  if (escKeyHandler) {
+    document.removeEventListener('keydown', escKeyHandler);
+  }
+
 
   escKeyHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       closeBigPicture();
     }
   };
-
   document.addEventListener('keydown', escKeyHandler);
 
   closeButton.addEventListener('click', closeBigPicture);

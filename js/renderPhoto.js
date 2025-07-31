@@ -26,6 +26,10 @@ const renderPhotos = (photos) => {
 
   photos.forEach((photo, index) => {
     const element = createPhotoElement(photo,index);
+    element.addEventListener('click', () => {
+      openBigPicture(photo);
+    });
+
     fragment.appendChild(element);
   });
 
@@ -33,6 +37,7 @@ const renderPhotos = (photos) => {
 };
 
 export { renderPhotos };
+import { openBigPicture } from './bigPicture.js';
 
 
 

@@ -1,9 +1,49 @@
-import { sendFormData } from "./api";
+import { sendFormData } from './api';
+export { showMessage };
 const imageInput = document.querySelector('#upload-file');
 const imagePreview = document.querySelector('.img-upload__preview img');
 const imgUploadOverlay = document.querySelector('.img-upload__overlay');
 const body = document.body;
+const uploadForm = document.querySelector('.img-upload__form');
+const uploadFormButton = document.querySelector('.img-upload__submit');
+let pristine;
 
+const cancelButton = document.querySelector('#upload-cancel');
+
+if (cancelButton) {
+  cancelButton.addEventListener('click', () => {
+    closeOverlay();
+  });
+}
+
+function closeOverlay() {
+  console.trace();
+  if(imgUploadOverlay && imagePreview) {
+    uploadForm.reset();
+    imgUploadOverlay.classList.add('hidden');
+
+    body.classList.remove('modal-open');
+    imageInput.value = '';
+  }
+}
+
+
+const closeMessage = (templateId) => {
+  const message = document.querySelector(`.${templateId}`);
+  if (message) {
+    message.remove();
+    document.removeEventListener('click',closeMessageHandler);
+    document.removeEventListener('keydown',closeMessageHandler);
+  }
+};
+
+const closeMessageHandler = (templateId, evt) => {
+  const target = evt.target;
+
+  if (target.closest('button') || target.classList.contains(`${templateId}`)) {
+    closeMessage(templateId);
+  }
+};
 const showMessage = (templateId) => {
   const template = document.querySelector(`#${templateId}`);
   if (!template) {
@@ -12,17 +52,22 @@ const showMessage = (templateId) => {
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
 
+  const closeFn = (evt) => closeMessageHandler(templateId, evt);
+
+  document.addEventListener('click', closeFn);
+
+  if (templateId === 'succes') {
+    closeOverlay();
+  }
+
   setTimeout(() => {
-    const msg = document.querySelector(`.${templateId}`) || document.querySelector(`section.${templateId}`);
-    if (msg) {
-      msg.remove();
-    }
+    closeMessage(templateId);
   }, 5000);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#upload-select-image');
-  const pristine = new Pristine(form, {
+    pristine = new Pristine(form, {
     classTo: 'img-upload__field-wrapper',
     errorClass: 'is-invalid',
     successClass: 'is-valid',
@@ -47,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     for (const tag of hashtags) {
       if (!tag.startsWith('#')) return false;
-      if (tag.length < 2) return false;
+      if (tag.length === 1) return false;
       if (tag.length > 20) return false;
       const tagBody = tag.slice(1);
       if (!/^[A-Za-zА-Яа-яЁё0-9]+$/.test(tagBody)) return false;
@@ -55,20 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return true;
   }, 'Некорректные хештеги');
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const activeElement = document.activeElement;
-
-      if(
-        activeElement === hashtagsInput ||
-        activeElement === commentInput
-      ) {
-        return
-      }
-      closeOverlay();
-    }
-  });
 
   if (imageInput && imagePreview && imgUploadOverlay) {
     imageInput.addEventListener('change', (e) => {
@@ -104,6 +135,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      const errorMessage = document.querySelector('.error');
+      const successMessage = document.querySelector('.success');
+
+      if (errorMessage || successMessage) {
+        // Если есть сообщение, закрываем только его
+        if (errorMessage) {
+          closeMessage('error');
+        }
+        if (successMessage) {
+          closeMessage('success');
+        }
+        return;
+      }
+
+    }
+
     const activeElement = document.activeElement;
 
     if (
@@ -112,31 +160,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ) {
       return;
     }
-
-    if (e.key === 'Escape') {
-      closeOverlay();
-    }
+    closeOverlay();
   });
 
-  function closeOverlay() {
-    if (formUploadOverlay && imagePreview) {
-      formUploadOverlay.classList.add('hidden');
-
-      body.classList.remove('modal-open');
-      imageInput.value = '';
-    }
-  }
-
-  const formUploadOverlay = document.querySelector('.img-upload__overlay');
-  const uploadForm = document.querySelector('.img-upload__form')
-
-  const closeForm = () => {
-    formUploadOverlay.classList.add('hidden');
-  }
 
   uploadForm.addEventListener('submit', (e) => {
     e.preventDefault();
     if (pristine.validate()) {
+      uploadFormButton.disabled = true;
       const formData = new FormData(uploadForm);
       sendFormData(formData)
         .then(() => {
@@ -147,9 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {
           showMessage('error');
-        });
+        }).finally(() => {
+          uploadFormButton.disabled = false;
+        })
     }
   });
 });
-
-export { showMessage };
