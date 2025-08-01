@@ -1,4 +1,4 @@
-import{photosArray} from './photos.js';
+import { openBigPicture } from './bigPicture.js';
 
 const createPhotoElement = (photo, index) => {
   const template = document.querySelector('#picture').content.querySelector('.picture');
@@ -26,6 +26,10 @@ const renderPhotos = (photos) => {
 
   photos.forEach((photo, index) => {
     const element = createPhotoElement(photo,index);
+    element.addEventListener('click', () => {
+      openBigPicture(photo);
+    });
+
     fragment.appendChild(element);
   });
 
@@ -33,25 +37,3 @@ const renderPhotos = (photos) => {
 };
 
 export { renderPhotos };
-
-import { openBigPicture } from './bigPicture.js';
-
-const containerPhotos = document.querySelector('.pictures');
-
-const addThumbnailClickListeners = () => {
-  containerPhotos.addEventListener('click', (evt) => {
-    const thumbnail = evt.target.closest('.picture');
-    if (!thumbnail) {
-      return;
-    }
-
-    const index = parseInt(thumbnail.dataset.index, 10);
-    if (isNaN(index)) {
-      return;
-    }
-    const photoData = photosArray[index];
-    openBigPicture(photoData);
-  });
-};
-
-addThumbnailClickListeners();

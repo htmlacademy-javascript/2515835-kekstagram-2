@@ -1,6 +1,72 @@
+import { sendFormData } from './api';
+const imageInput = document.querySelector('#upload-file');
+const imagePreview = document.querySelector('.img-upload__preview img');
+const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+const body = document.body;
+const uploadForm = document.querySelector('.img-upload__form');
+const uploadFormButton = document.querySelector('.img-upload__submit');
+let pristine;
+
+const cancelButton = document.querySelector('#upload-cancel');
+
+if (cancelButton) {
+  cancelButton.addEventListener('click', () => {
+    closeOverlay();
+  });
+}
+
+function closeOverlay() {
+  pristine.reset();
+  if(imgUploadOverlay && imagePreview) {
+    uploadForm.reset();
+    imgUploadOverlay.classList.add('hidden');
+
+    body.classList.remove('modal-open');
+    imageInput.value = '';
+  }
+}
+
+const closeMessageHandler = (templateId, evt) => {
+  const target = evt.target;
+
+  if (target.closest('button') || target.classList.contains(`${templateId}`)) {
+    closeMessage(templateId);
+  }
+};
+
+const closeMessage = (templateId) => {
+  const message = document.querySelector(`.${templateId}`);
+  if (message) {
+    message.remove();
+    document.removeEventListener('click',closeMessageHandler);
+    document.removeEventListener('keydown',closeMessageHandler);
+  }
+};
+
+const showMessage = (templateId) => {
+  const template = document.querySelector(`#${templateId}`);
+  if (!template) {
+    return;
+  }
+  const clone = template.content.cloneNode(true);
+  document.body.appendChild(clone);
+
+  const closeFn = (evt) => closeMessageHandler(templateId, evt);
+
+  document.addEventListener('click', closeFn);
+
+  if (templateId === 'succes') {
+    closeOverlay();
+  }
+
+  setTimeout(() => {
+    closeMessage(templateId);
+  }, 5000);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('#upload-select-image');
-  const pristine = new Pristine(form, {
+  pristine = new Pristine(form, {
     classTo: 'img-upload__field-wrapper',
     errorClass: 'is-invalid',
     successClass: 'is-valid',
@@ -13,35 +79,64 @@ document.addEventListener('DOMContentLoaded', () => {
   const commentInput = document.querySelector('.text__description');
 
   pristine.addValidator(hashtagsInput, (value) => {
-    const errorMessages = [];
-
     if (!value) {
       return true;
     }
 
-    const hashtags = value.split(' ').map((tag) => tag.toLowerCase());
-    const uniqueHashtags = new Set(hashtags);
+    const hashtags = value.trim().split(/\s+/);
 
     if (hashtags.length > 5) {
-      errorMessages.push('Слишком много хештегов (максимум 5).');
-    }
-
-    if (uniqueHashtags.size !== hashtags.length) {
-      errorMessages.push('Хештеги должны быть уникальными.');
-    }
-
-    for (const tag of uniqueHashtags) {
-      if (!/^#[A-Za-z0-9]{1,19}$/.test(tag)) {
-        errorMessages.push('Некорректный формат хештега.');
-      }
-    }
-
-    if (errorMessages.length > 0) {
       return false;
     }
 
+    const lowerHashtags = hashtags.map((tag) => tag.toLowerCase());
+    const uniqueHashtags = new Set(lowerHashtags);
+    if (uniqueHashtags.size !== hashtags.length) {
+      return false;
+    }
+
+    for (const tag of hashtags) {
+      if (!tag.startsWith('#')) {
+        return false;
+      }
+      if (tag.length === 1) {
+        return false;
+      }
+      if (tag.length > 20) {
+        return false;
+      }
+      const tagBody = tag.slice(1);
+      if (!/^[A-Za-zА-Яа-яЁё0-9]+$/.test(tagBody)) {
+        return false;
+      }
+      if (tag === '#') {
+        return false;
+      }
+
+
+    }
     return true;
+
+
   }, 'Некорректные хештеги');
+
+  if (imageInput && imagePreview && imgUploadOverlay) {
+    imageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+          imagePreview.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+
+        imgUploadOverlay.classList.remove('hidden');
+        body.classList.add('modal-open');
+      }
+    });
+  }
 
 
   pristine.addValidator(
@@ -55,59 +150,59 @@ document.addEventListener('DOMContentLoaded', () => {
     'Комментарий не может превышать 140 символов'
   );
 
-  hashtagsInput.addEventListener('input', () => {
-    pristine.validate();
+
+  hashtagsInput.addEventListener('input', () => pristine.validate());
+  commentInput.addEventListener('input', () => pristine.validate());
+
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      const activeElement = document.activeElement;
+      const hashtagsInput = document.querySelector('.text__hashtags');
+      const commentInput = document.querySelector('.text__description');
+
+      if (
+        activeElement === hashtagsInput ||
+        activeElement === commentInput
+      ) {
+        return;
+      }
+
+      const errorMessage = document.querySelector('.error');
+      const successMessage = document.querySelector('.success');
+
+      if (errorMessage) {
+        closeMessage('error');
+
+        return;
+      }
+      if (successMessage) {
+        closeMessage('success');
+      }
+
+      closeOverlay();
+    }
   });
 
-  commentInput.addEventListener('input', () => {
-    pristine.validate();
-  });
-
-  form.addEventListener('submit', (e) => {
+  uploadForm.addEventListener('submit', (e) => {
     e.preventDefault();
-
-
     if (pristine.validate()) {
-      // Форма валидна! Отправка данных...
-
-    } else {
-      // Форма содержит ошибки. Исправьте их перед отправкой.
+      uploadFormButton.disabled = true;
+      const formData = new FormData(uploadForm);
+      sendFormData(formData)
+        .then(() => {
+          showMessage('success');
+          uploadForm.reset();
+          closeOverlay();
+          pristine.reset({});
+        })
+        .catch(() => {
+          showMessage('error');
+        }).finally(() => {
+          uploadFormButton.disabled = false;
+        });
     }
   });
-
-  let isOverlayClosed = false;
-
-  function toggleOverlayListeners(add) {
-    if (add) {
-      hashtagsInput.addEventListener('focus', removeOverlayListener);
-      commentInput.addEventListener('focus', removeOverlayListener);
-      hashtagsInput.addEventListener('blur', addOverlayListener);
-      commentInput.addEventListener('blur', addOverlayListener);
-    } else {
-      hashtagsInput.removeEventListener('focus', removeOverlayListener);
-      commentInput.removeEventListener('focus', removeOverlayListener);
-      hashtagsInput.removeEventListener('blur', addOverlayListener);
-      commentInput.removeEventListener('blur', addOverlayListener);
-    }
-  }
-
-  function removeOverlayListener() {
-    document.removeEventListener('keydown', closeOverlay);
-  }
-
-  function addOverlayListener() {
-    if (!isOverlayClosed) {
-      document.addEventListener('keydown', closeOverlay);
-    }
-  }
-
-  function closeOverlay(e) {
-    if (e.key === 'Escape') {
-      isOverlayClosed = true;
-      toggleOverlayListeners(false);
-
-    }
-  }
-
-  toggleOverlayListeners(true);
 });
+
+export { showMessage };

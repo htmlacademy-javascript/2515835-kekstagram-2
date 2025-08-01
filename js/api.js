@@ -8,7 +8,7 @@ export const fetchPhotos = () =>
     });
 
 export const sendFormData = (formData) =>
-  fetch('https://31.javascript.htmlacademy.pro/kekstagram/data', {
+  fetch('https://31.javascript.htmlacademy.pro/kekstagram/', {
     method: 'POST',
     body: formData,
   }).then((response) => {

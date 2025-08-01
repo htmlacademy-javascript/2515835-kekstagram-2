@@ -16,14 +16,12 @@ let commentsShownCount = 0;
 const COMMENTS_PER_PAGE = 5;
 
 const closeBigPicture = () => {
-
   document.removeEventListener('keydown', escKeyHandler);
 
   if (onLoadMoreComments) {
     loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
     onLoadMoreComments = null;
   }
-
 
   bigPictureContainer.classList.add('hidden');
 
@@ -48,10 +46,11 @@ const showComments = () => {
     commentsList.appendChild(commentItem);
   });
 
+
   commentsCountElement.textContent = commentsToShow.length;
   totalCommentsCountElement.textContent = allComments.length;
 
-  if (commentsToShow.length >= allComments.length) {
+  if (commentsShownCount >= allComments.length) {
     loadMoreCommentsButton.classList.add('hidden');
   } else {
     loadMoreCommentsButton.classList.remove('hidden');
@@ -59,11 +58,9 @@ const showComments = () => {
 };
 
 export const openBigPicture = (photoData) => {
-
   bigPictureImage.src = photoData.url;
   bigPictureImage.alt = photoData.description;
   likesCountElement.textContent = photoData.likes;
-
 
   allComments = photoData.comments;
 
@@ -73,7 +70,6 @@ export const openBigPicture = (photoData) => {
   showComments();
 
   captionElement.textContent = photoData.description;
-
 
   bigPictureContainer.classList.remove('hidden');
 
@@ -91,6 +87,7 @@ export const openBigPicture = (photoData) => {
 
   loadMoreCommentsButton.removeEventListener('click', onLoadMoreComments);
 
+
   if (allComments.length > COMMENTS_PER_PAGE) {
     loadMoreCommentsButton.classList.remove('hidden');
     loadMoreCommentsButton.addEventListener('click', onLoadMoreComments);
@@ -101,15 +98,17 @@ export const openBigPicture = (photoData) => {
 
   document.body.classList.add('modal-open');
 
+  if (escKeyHandler) {
+    document.removeEventListener('keydown', escKeyHandler);
+  }
+
 
   escKeyHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       closeBigPicture();
     }
   };
-
   document.addEventListener('keydown', escKeyHandler);
-
 
   closeButton.addEventListener('click', closeBigPicture);
 };

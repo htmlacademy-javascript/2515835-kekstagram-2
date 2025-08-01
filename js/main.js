@@ -1,24 +1,11 @@
-import { renderPhotos } from './renderPhoto.js';
 import { openBigPicture } from './bigPicture.js';
-import { fetchPhotos, sendFormData } from './api.js';
+import { fetchPhotos } from './api.js';
 import { formModule } from './formModule.js';
 import { debounce } from './utils.js';
+import { renderPhotos,} from './renderPhoto.js';
+import'./form-validation.js';
+import { showMessage } from './form-validation.js';
 
-const showMessage = (templateId) => {
-  const template = document.querySelector(`#${templateId}`);
-  if (!template) {
-    return;
-  }
-  const clone = template.content.cloneNode(true);
-  document.body.appendChild(clone);
-
-  setTimeout(() => {
-    const msg = document.querySelector(`.${templateId}`) || document.querySelector(`section.${templateId}`);
-    if (msg) {
-      msg.remove();
-    }
-  }, 5000);
-};
 
 const form = document.querySelector('.img-filters__form');
 
@@ -26,20 +13,12 @@ fetchPhotos()
   .then((arr) => {
     const allPhotos = [...arr];
 
-
     renderPhotos(arr);
-
-
-    document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-      thumb.addEventListener('click', () => {
-        openBigPicture(arr[index]);
-      });
-    });
 
 
     const filtersContainer = document.querySelector('.img-filters');
     if (filtersContainer) {
-
+      filtersContainer.classList.remove('hidden');
       const getRandomInt = (min, max) => {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -56,7 +35,8 @@ fetchPhotos()
       };
 
       const clearPhotos = () => {
-        document.querySelector('.picture').remove();
+        const pictures = document.querySelectorAll('.picture');
+        pictures.forEach((picture) => picture.remove());
       };
 
       const applyFilter = (filterId) => {
@@ -76,36 +56,26 @@ fetchPhotos()
         }
         clearPhotos();
         renderPhotos(filteredPhotos);
+
+        document.querySelectorAll('.picture').forEach((thumb, index) => {
+          thumb.addEventListener('click', () => {
+            openBigPicture(filteredPhotos[index]);
+          });
+        });
       };
 
-      form.addEventListener('click', debounce((evt)=>{
+      const debouncedApplyFilter = debounce(applyFilter, 500);
+
+      form.addEventListener('click', (evt)=>{
         if(evt.target.tagName !== 'BUTTON') {
           return;
         }
 
-
-        form.querySelectorAll('button').forEach((btn)=>btn.classList.remove('img-filters__button--active'));
+        form.querySelectorAll('button').forEach((btn) => btn.classList.remove('img-filters__button--active'));
         evt.target.classList.add('img-filters__button--active');
 
         const filterId = evt.target.id;
-        applyFilter(filterId);
-
-      },500));
-    }
-
-
-    if (form) {
-      form.addEventListener('submit', (evt)=>{
-        evt.preventDefault();
-        const formData = new FormData(form);
-        sendFormData(formData)
-          .then(()=>{
-            showMessage('success');
-            form.reset();
-          })
-          .catch(()=>{
-            showMessage('error');
-          });
+        debouncedApplyFilter(filterId);
       });
     }
 

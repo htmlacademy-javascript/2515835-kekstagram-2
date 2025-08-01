@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSmaller = document.querySelector('.scale__control--smaller');
   const btnBigger = document.querySelector('.scale__control--bigger');
   const previewImage = document.querySelector('.img-upload__preview img');
+  const imageInput = document.querySelector('#upload-file');
+  const imgUploadOverlay = document.querySelector('.img-upload__overlay');
+  const body = document.body;
 
 
   function getCurrentScale() {
@@ -41,24 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
       min: [0],
       max: [100]
     },
-    step:1,
-    connect:'lower'
+    step: 1,
+    connect: 'lower'
   });
 
 
-  function getMaxForEffect(effect){
-    switch(effect){
-      case 'chrome': return 1.0;
-      case 'sepia': return 1.0;
-      case 'marvin': return 1.0;
-      case 'phobos': return 3.0;
-      case 'heat': return 2.0;
-    }
-    return 1.0;
-  }
-
   function setFilter(effect, level) {
-    switch(effect) {
+    switch (effect) {
       case 'none':
         previewImage.style.filter = '';
         break;
@@ -69,13 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         previewImage.style.filter = `sepia(${level})`;
         break;
       case 'marvin':
-        previewImage.style.filter = `invert(${level * 100}%)`;
+        previewImage.style.filter = `invert(${level}%)`;
         break;
       case 'phobos':
-        previewImage.style.filter = `blur(${level * 3}px)`;
+        previewImage.style.filter = `blur(${level}px)`;
         break;
       case 'heat':
-        previewImage.style.filter = `brightness(${1 + level})`;
+        previewImage.style.filter = `brightness(${level})`;
         break;
     }
   }
@@ -84,52 +76,57 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyEffect(effect) {
     currentEffect = effect;
 
-    if(effect === 'none'){
-
+    if (effect === 'none') {
       effectLevelContainer.style.display = 'none';
-
-
       previewImage.style.filter = '';
-
-
       effectLevelNumberInput.value = '0';
-
-    } else{
+    } else {
       effectLevelContainer.style.display = 'block';
-      let initialLevel = 1;
 
-      switch(effect){
-        case 'chrome': initialLevel = 1; break;
-        case 'sepia': initialLevel = 1; break;
-        case 'marvin': initialLevel = 1; break;
-        case 'phobos': initialLevel = 3; break;
-        case 'heat': initialLevel = 2; break;
+      let min, max, step, initialValue;
+
+      switch (effect) {
+        case 'chrome':
+        case 'sepia':
+          min = 0;
+          max = 1;
+          step = 0.1;
+          initialValue = 1;
+          break;
+        case 'marvin':
+          min = 0;
+          max = 100;
+          step = 1;
+          initialValue = 100;
+          break;
+        case 'phobos':
+          min = 0;
+          max = 3;
+          step = 0.1;
+          initialValue = 3;
+          break;
+        case 'heat':
+          min = 1;
+          max = 3;
+          step = 0.1;
+          initialValue = 3;
+          break;
       }
 
-      sliderContainer.noUiSlider.set(initialLevel * getMaxForEffect(effect));
+      sliderContainer.noUiSlider.updateOptions({
+        range: { min, max },
+        step,
+        start: [initialValue]
+      });
 
-
-      setFilter(effect, initialLevel);
-
+      sliderContainer.noUiSlider.set(initialValue);
+      setFilter(effect, initialValue);
+      effectLevelNumberInput.value = initialValue.toString();
 
       sliderContainer.noUiSlider.on('update', (values) => {
-        const valuePercent = parseFloat(values[0]);
-        let level;
-
-        switch(effect){
-          case 'chrome':
-          case 'sepia':
-          case 'marvin':
-          case 'phobos':
-          case 'heat':
-            level = valuePercent / 100;
-            setFilter(currentEffect, level);
-            break;
-        }
-
-
-        effectLevelNumberInput.value = valuePercent.toFixed(2);
-
+        const value = parseFloat(values[0]);
+        setFilter(currentEffect, value);
+        effectLevelNumberInput.value = value.toString();
       });
     }
   }
@@ -139,6 +136,31 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
       applyEffect(radio.value);
     });
+  });
+
+  function updateEffectPreviews(imageSrc) {
+    const previews = document.querySelectorAll('.effects__preview');
+
+    previews.forEach((preview) => {
+      const img = preview.querySelector('img');
+      if (img) {
+        img.src = imageSrc;
+      } else {
+        preview.style.backgroundImage = `url(${imageSrc})`;
+      }
+    });
+  }
+
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const imageSrc = URL.createObjectURL(file);
+      previewImage.src = imageSrc;
+      updateEffectPreviews(imageSrc);
+
+      imgUploadOverlay.classList.remove('hidden');
+      body.classList.add('modal-open');
+    }
   });
 
   applyEffect('none');
