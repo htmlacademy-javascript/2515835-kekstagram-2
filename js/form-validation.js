@@ -158,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' || e.key === 'Esc') {
       const activeElement = document.activeElement;
-      const hashtagsInput = document.querySelector('.text__hashtags');
-      const commentInput = document.querySelector('.text__description');
 
       if (
         activeElement === hashtagsInput ||
