@@ -26,22 +26,22 @@ function closeOverlay() {
   }
 }
 
-const closeMessageHandler = (templateId, evt) => {
+function closeMessageHandler(templateId, evt) {
   const target = evt.target;
 
   if (target.closest('button') || target.classList.contains(`${templateId}`)) {
     closeMessage(templateId);
   }
-};
+}
 
-const closeMessage = (templateId) => {
+function closeMessage(templateId) {
   const message = document.querySelector(`.${templateId}`);
   if (message) {
     message.remove();
-    document.removeEventListener('click',closeMessageHandler);
-    document.removeEventListener('keydown',closeMessageHandler);
+    document.removeEventListener('click', closeMessageHandler);
+    document.removeEventListener('keydown', closeMessageHandler);
   }
-};
+}
 
 const showMessage = (templateId) => {
   const template = document.querySelector(`#${templateId}`);
@@ -158,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' || e.key === 'Esc') {
       const activeElement = document.activeElement;
-      const hashtagsInput = document.querySelector('.text__hashtags');
-      const commentInput = document.querySelector('.text__description');
 
       if (
         activeElement === hashtagsInput ||
