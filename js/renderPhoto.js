@@ -1,4 +1,4 @@
-import{photosArray} from './photos.js';
+import { openBigPicture } from './bigPicture.js';
 
 const createPhotoElement = (photo, index) => {
   const template = document.querySelector('#picture').content.querySelector('.picture');
@@ -37,10 +37,3 @@ const renderPhotos = (photos) => {
 };
 
 export { renderPhotos };
-import { openBigPicture } from './bigPicture.js';
-
-
-
-
-
-

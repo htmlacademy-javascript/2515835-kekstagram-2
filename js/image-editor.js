@@ -154,17 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
   imageInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function (event) {
-        const imageSrc = event.target.result;
-
-        previewImage.src = imageSrc;
-
-        updateEffectPreviews(imageSrc);
-      };
-
-      reader.readAsDataURL(file);
+      const imageSrc = URL.createObjectURL(file);
+      previewImage.src = imageSrc;
+      updateEffectPreviews(imageSrc);
 
       imgUploadOverlay.classList.remove('hidden');
       body.classList.add('modal-open');

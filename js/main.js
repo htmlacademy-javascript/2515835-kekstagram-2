@@ -4,7 +4,7 @@ import { formModule } from './formModule.js';
 import { debounce } from './utils.js';
 import { renderPhotos,} from './renderPhoto.js';
 import'./form-validation.js';
-import { showMessage } from './form-validation.js'
+import { showMessage } from './form-validation.js';
 
 
 const form = document.querySelector('.img-filters__form');
@@ -36,7 +36,7 @@ fetchPhotos()
 
       const clearPhotos = () => {
         const pictures = document.querySelectorAll('.picture');
-        pictures.forEach(picture => picture.remove());
+        pictures.forEach((picture) => picture.remove());
       };
 
       const applyFilter = (filterId) => {
@@ -58,7 +58,7 @@ fetchPhotos()
         renderPhotos(filteredPhotos);
 
         document.querySelectorAll('.picture').forEach((thumb, index) => {
-          thumb.addEventListener('click', (evt) => {
+          thumb.addEventListener('click', () => {
             openBigPicture(filteredPhotos[index]);
           });
         });
