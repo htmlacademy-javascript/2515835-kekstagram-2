@@ -34,8 +34,6 @@ const closeBigPicture = () => {
 const showComments = () => {
   commentsList.innerHTML = '';
 
-
-
   const commentsToShow = allComments.slice(0, commentsShownCount);
   commentCountBlock.classList.remove('hidden');
 
