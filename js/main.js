@@ -10,10 +10,10 @@ import { showMessage } from './form-validation.js';
 const form = document.querySelector('.img-filters__form');
 
 fetchPhotos()
-  .then((arr) => {
-    const allPhotos = [...arr];
+  .then((images) => {
+    const allPhotos = [...images];
 
-    renderPhotos(arr);
+    renderPhotos(images);
 
 
     const filtersContainer = document.querySelector('.img-filters');
@@ -26,12 +26,12 @@ fetchPhotos()
       };
 
       const getRandomPhotos = (photos, count) => {
-        const shuffled = [...photos];
-        for (let i = shuffled.length - 1; i > 0; i--) {
+        const tempPhotos = [...photos];
+        for (let i = tempPhotos.length - 1; i > 0; i--) {
           const j = getRandomInt(0,i);
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          [tempPhotos[i], tempPhotos[j]] = [tempPhotos[j], tempPhotos[i]];
         }
-        return shuffled.slice(0,count);
+        return tempPhotos.slice(0,count);
       };
 
       const clearPhotos = () => {

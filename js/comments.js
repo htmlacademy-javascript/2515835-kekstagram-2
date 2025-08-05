@@ -30,7 +30,7 @@ export function generateComments() {
   for (let i = 0; i < numberOfComments; i++) {
     let commentId;
     do {
-      commentId = getRandomInt(1, 1000); // Генерируем случайный id для комментария
+      commentId = getRandomInt(1, 1000);
     } while (usedCommentIds.has(commentId));
 
     usedCommentIds.add(commentId);

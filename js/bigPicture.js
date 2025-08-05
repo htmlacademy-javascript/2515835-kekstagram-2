@@ -1,4 +1,3 @@
-let onLoadMoreComments;
 const bigPictureContainer = document.querySelector('.big-picture');
 const bigPictureImage = bigPictureContainer.querySelector('.big-picture__img img');
 const likesCountElement = bigPictureContainer.querySelector('.likes-count');
@@ -9,11 +8,13 @@ const captionElement = bigPictureContainer.querySelector('.social__caption');
 const closeButton = bigPictureContainer.querySelector('.big-picture__cancel');
 const commentCountBlock = bigPictureContainer.querySelector('.social__comment-count');
 const loadMoreCommentsButton = bigPictureContainer.querySelector('.comments-loader');
+const COMMENTS_PER_PAGE = 5;
 
+let onLoadMoreComments;
 let escKeyHandler;
 let allComments = [];
 let commentsShownCount = 0;
-const COMMENTS_PER_PAGE = 5;
+
 
 const closeBigPicture = () => {
   document.removeEventListener('keydown', escKeyHandler);
@@ -33,28 +34,47 @@ const closeBigPicture = () => {
 const showComments = () => {
   commentsList.innerHTML = '';
 
+
+
   const commentsToShow = allComments.slice(0, commentsShownCount);
+  commentCountBlock.classList.remove('hidden');
+
 
   commentsToShow.forEach((comment) => {
     const commentItem = document.createElement('li');
     commentItem.classList.add('social__comment');
 
-    commentItem.innerHTML = `
-      <img class="social__picture" src="${comment.avatar}" alt="${comment.name}" width="35" height="35">
-      <p class="social__text">${comment.message}</p>
-    `;
+    const img = document.createElement('img');
+    img.className = 'social__picture';
+    img.src = comment.avatar;
+    img.alt = comment.name;
+    img.width = 35;
+    img.height = 35;
+
+    const p = document.createElement('p');
+    p.className = 'social__text';
+    p.textContent = comment.message;
+
+    commentItem.appendChild(img);
+    commentItem.appendChild(p);
+
     commentsList.appendChild(commentItem);
   });
 
 
-  commentsCountElement.textContent = commentsToShow.length;
-  totalCommentsCountElement.textContent = allComments.length;
+  if (commentsCountElement && totalCommentsCountElement) {
+    commentsCountElement.textContent = `${commentsToShow.length}`;
+    totalCommentsCountElement.textContent = `${allComments.length}`;
+  }
+
 
   if (commentsShownCount >= allComments.length) {
     loadMoreCommentsButton.classList.add('hidden');
   } else {
     loadMoreCommentsButton.classList.remove('hidden');
   }
+
+
 };
 
 export const openBigPicture = (photoData) => {

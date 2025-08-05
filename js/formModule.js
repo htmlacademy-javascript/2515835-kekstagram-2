@@ -1,8 +1,8 @@
 export const formModule = {
   rules: {
-    required: (message) => (value) => (!value ? message : null),
-    minLength: (min, message) => (value) => (value.length < min ? message : null),
-    maxLength: (max, message) => (value) => (value.length > max ? message : null),
+    getRequiredValidator: (message) => (value) => (!value ? message : null),
+    getMinLengthValidator: (min, message) => (value) => (value.length < min ? message : null),
+    getMaxLengthValidator: (max, message) => (value) => (value.length > max ? message : null),
   },
   validationRules: {},
 

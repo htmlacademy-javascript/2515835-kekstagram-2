@@ -1,4 +1,5 @@
 import { sendFormData } from './api';
+
 const imageInput = document.querySelector('#upload-file');
 const imagePreview = document.querySelector('.img-upload__preview img');
 const imgUploadOverlay = document.querySelector('.img-upload__overlay');
@@ -10,17 +11,17 @@ let pristine;
 const cancelButton = document.querySelector('#upload-cancel');
 
 if (cancelButton) {
-  cancelButton.addEventListener('click', () => {
+  const onCancelButtonClick = () => {
     closeOverlay();
-  });
+  };
+  cancelButton.addEventListener('click', onCancelButtonClick);
 }
 
 function closeOverlay() {
   pristine.reset();
-  if(imgUploadOverlay && imagePreview) {
+  if (imgUploadOverlay && imagePreview) {
     uploadForm.reset();
     imgUploadOverlay.classList.add('hidden');
-
     body.classList.remove('modal-open');
     imageInput.value = '';
   }
@@ -28,7 +29,6 @@ function closeOverlay() {
 
 function closeMessageHandler(templateId, evt) {
   const target = evt.target;
-
   if (target.closest('button') || target.classList.contains(`${templateId}`)) {
     closeMessage(templateId);
   }
@@ -51,9 +51,8 @@ const showMessage = (templateId) => {
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
 
-  const closeFn = (evt) => closeMessageHandler(templateId, evt);
-
-  document.addEventListener('click', closeFn);
+  const onDocumentClick = (evt) => closeMessageHandler(templateId, evt);
+  document.addEventListener('click', onDocumentClick);
 
   if (templateId === 'succes') {
     closeOverlay();
@@ -116,28 +115,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
     return true;
-
-
   }, 'Некорректные хештеги');
 
   if (imageInput && imagePreview && imgUploadOverlay) {
-    imageInput.addEventListener('change', (e) => {
+    const onImageChange = (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-
         reader.onload = function (event) {
           imagePreview.src = event.target.result;
         };
-
         reader.readAsDataURL(file);
-
         imgUploadOverlay.classList.remove('hidden');
         body.classList.add('modal-open');
       }
-    });
+    };
+    imageInput.addEventListener('change', onImageChange);
   }
-
 
   pristine.addValidator(
     commentInput,
@@ -151,14 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
 
-  hashtagsInput.addEventListener('input', () => pristine.validate());
-  commentInput.addEventListener('input', () => pristine.validate());
+  const onHashtagsInputChange = () => pristine.validate();
+  hashtagsInput.addEventListener('input', onHashtagsInputChange);
 
+  const onCommentInputChange = () => pristine.validate();
+  commentInput.addEventListener('input', onCommentInputChange);
 
-  document.addEventListener('keydown', (e) => {
+  const onDocumentKeyDown = (e) => {
     if (e.key === 'Escape' || e.key === 'Esc') {
       const activeElement = document.activeElement;
-
       if (
         activeElement === hashtagsInput ||
         activeElement === commentInput
@@ -180,9 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       closeOverlay();
     }
-  });
+  };
 
-  uploadForm.addEventListener('submit', (e) => {
+  document.addEventListener('keydown', onDocumentKeyDown);
+
+  const onUploadFormSubmit = (e) =>{
     e.preventDefault();
     if (pristine.validate()) {
       uploadFormButton.disabled = true;
@@ -200,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
           uploadFormButton.disabled = false;
         });
     }
-  });
+  };
+  uploadForm.addEventListener('submit', onUploadFormSubmit);
 });
 
 export { showMessage };
