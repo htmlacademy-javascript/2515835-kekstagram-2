@@ -25,6 +25,7 @@ function closeOverlay() {
     body.classList.remove('modal-open');
     imageInput.value = '';
   }
+
 }
 
 function closeMessageHandler(templateId, evt) {
